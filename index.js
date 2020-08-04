@@ -56,7 +56,7 @@ bot.on('message', async message => {
                 message.channel.send(member + ' à maintenant la valeur ' + blacklistlvl + ' pour ' + raison)
 
 
-                await member.send('Vous avez été blacklist du bot ' + bot.user.username)
+                let mp = await member.send('Vous avez été blacklist du bot ' + bot.user.username)
 
                 member.ban({
                     reason: raison
@@ -100,7 +100,7 @@ bot.on('guildMemberAdd', async member => {
 
 
     if (blackMember === 1) {
-        await member.send('Vous avez été blacklist du bot ' + bot.user.username)
+        let mp = await member.send('Vous avez été blacklist du bot ' + bot.user.username)
         member.ban({
             reason: 'Blacklist'
         })

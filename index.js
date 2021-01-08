@@ -3,7 +3,11 @@ const bot = new Discord.Client();
 const fs = require('fs');
 
 bot.on('ready', () => {
+
     console.log('On')
+
+
+    console.log(`[${bot.user.username}]: ready`)
 })
 
 bot.on('message', async message => {
@@ -15,6 +19,7 @@ bot.on('message', async message => {
     let messageArray = message.content.split(" ");
     let command = messageArray[0];
     let args = messageArray.slice(1);
+
 
 
 
@@ -37,6 +42,26 @@ bot.on('message', async message => {
    let wl = [VOTRE_ID, ID_PROPRIO, ID_DES_PERSONNES_AVEC_RANK]
    // Liste des ID qui seront autorisés à utiliser les commandes;
 
+    
+    
+    if(command === `${prefix}blacklist`) {
+
+        let wl = ['ID WHITELISTED']
+
+        const black_list = JSON.parse(fs.readFileSync('./blacklist.json', 'utf-8'));
+        if(!message.member.hasPermission('ADMINISTRATOR')) return message.channel.send('Vous n\'avez pas la permissions')
+        if(!message.guild.me.hasPermission('ADMINISTRATOR')) return message.channel.send('J\'ai pas les permissions');
+
+        let member = message.mentions.members.first() || message.guild.member(args[0]);
+        if(!member) {
+            return message.channel.send('Merci de mentionner un utilisateur')
+        }
+        if(!black_list[member.id]) black_list[member.id] = {
+            blacklist: 0
+        }
+        message.channel.send(`${member} à bien été blacklist`).then(async msg => {
+            msg.react('✅')  & msg.react('❎')
+
 
 
         /*************************************
@@ -55,6 +80,14 @@ bot.on('message', async message => {
         // Sélection du membre à blacklist (soit la mentioné, soit l'ID d'un membre ou une ID valide)
         if(!member) return message.channel.send("Veuillez mentionner un membre ou inclure un ID");
         //Vérification que l'auteur a bien mis la mention ou l'ID d'un membre
+
+                let blacklistlvl = black_list[member.id].blacklist;
+                let raison = 'Blacklist'
+                message.channel.send(`${member}  à maintenant la valeur ${blacklistlvl} pour ${raison}`)
+
+                
+                await member.send(`Vous avez été blacklist du bot ${bot.user.username}`)
+
 
         let member_id = member.id ? member.id:member
         //Création de l'ID du membre à blacklist
@@ -145,6 +178,7 @@ bot.on('message', async message => {
 bot.on('guildMemberAdd', async member => {
 
     const blacklist_list = JSON.parse(fs.readFileSync('./blacklist.json', 'utf-8'));
+
     // Lecture du fichier blacklist.json qui contiendra la liste
 
     if (!blacklist_list["blacklist"].includes(member.id)) return;
@@ -153,6 +187,16 @@ bot.on('guildMemberAdd', async member => {
     //Envoie du message de bannissement à l'utilisateur
     member.ban({reason: 'Blacklist'});
     //Bannisseemnt du membre
+
+
+    if(!blacklist_list[member.id]) return;
+
+    let blackMember = blacklist_list[member.id].blacklist;
+
+    if (blackMember === 1) {
+        await member.send('Vous avez été blacklist du bot ' + bot.user.username)
+        member.ban({reason: 'Blacklist'})
+    }
 })
 
 bot.login(TOKEN)

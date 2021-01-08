@@ -4,7 +4,7 @@ const fs = require('fs');
 
 bot.on('ready', () => {
 
-    console.log('On')
+    console.log(`[${bot.user.username}]: ready`)
 })
 
 bot.on('message', async message => {
@@ -15,16 +15,11 @@ bot.on('message', async message => {
     let messageArray = message.content.split(" ");
     let command = messageArray[0];
     let args = messageArray.slice(1);
-
-
     
-
+    
     if(command === `${prefix}blacklist`) {
 
-        let wl = [
-        '390212129392820224' ||
-        '' 
-        ]
+        let wl = ['ID WHITELISTED']
 
         const black_list = JSON.parse(fs.readFileSync('./blacklist.json', 'utf-8'));
         if(!message.member.hasPermission('ADMINISTRATOR')) return message.channel.send('Vous n\'avez pas la permissions')
@@ -37,7 +32,7 @@ bot.on('message', async message => {
         if(!black_list[member.id]) black_list[member.id] = {
             blacklist: 0
         }
-        message.channel.send(member + ' à bien été blacklist').then(async msg => {
+        message.channel.send(`${member} à bien été blacklist`).then(async msg => {
             msg.react('✅')  & msg.react('❎')
 
             let filter = (reaction, user) => user.id === wl
@@ -53,10 +48,10 @@ bot.on('message', async message => {
 
                 let blacklistlvl = black_list[member.id].blacklist;
                 let raison = 'Blacklist'
-                message.channel.send(member + ' à maintenant la valeur ' + blacklistlvl + ' pour ' + raison)
+                message.channel.send(`${member}  à maintenant la valeur ${blacklistlvl} pour ${raison}`)
 
                 
-                await member.send('Vous avez été blacklist du bot ' + bot.user.username)
+                await member.send(`Vous avez été blacklist du bot ${bot.user.username}`)
 
                 member.ban({reason: raison})
                 }
@@ -96,13 +91,10 @@ bot.on('guildMemberAdd', async member => {
 
     let blackMember = blacklist_list[member.id].blacklist;
 
-    
     if (blackMember === 1) {
         await member.send('Vous avez été blacklist du bot ' + bot.user.username)
         member.ban({reason: 'Blacklist'})
     }
-
-    console.log('Okay')
 })
 
 bot.login(TOKEN)
